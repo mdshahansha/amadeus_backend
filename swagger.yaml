@@ -1,0 +1,205 @@
+openapi: 3.0.3
+info:
+  title: Amadeus API Backend
+  description: Comprehensive API documentation for Amadeus-based flight booking system.
+  version: 1.0.11
+  contact:
+    email: support@amadeusapi.com
+servers:
+  - url: http://localhost:8000
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Registers a new user with the provided details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - email
+                - password
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      email:
+                        type: string
+        '500':
+          description: Internal server error
+
+  /login:
+    post:
+      summary: Log in an existing user
+      description: Logs in an existing user with the provided credentials and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Invalid credentials
+        '500':
+          description: Internal server error
+
+  /search-flights:
+    post:
+      summary: Search for available flights
+      description: Searches for flights based on the provided search criteria (origin, destination, date, and adults).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                origin:
+                  type: string
+                destination:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                adults:
+                  type: integer
+              required:
+                - origin
+                - destination
+                - date
+                - adults
+      responses:
+        '200':
+          description: Flight search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          description: Unauthorized (Token missing or invalid)
+        '500':
+          description: Internal server error
+
+  /book-flight:
+    post:
+      summary: Book a flight
+      description: Books a flight based on the provided flight details.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                flightDetails:
+                  type: object
+                  description: Flight booking details
+                  properties:
+                    flightId:
+                      type: string
+                    passengerDetails:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        age:
+                          type: integer
+                        passportNumber:
+                          type: string
+                  required:
+                    - flightId
+                    - passengerDetails
+              required:
+                - flightDetails
+      responses:
+        '200':
+          description: Flight booked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthorized (Token missing or invalid)
+        '500':
+          description: Internal server error
+
+  /bookings:
+    get:
+      summary: Get all bookings for a user
+      description: Retrieves all bookings made by the authenticated user.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of user bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '401':
+          description: Unauthorized (Token missing or invalid)
+        '500':
+          description: Internal server error
