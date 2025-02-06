@@ -11,9 +11,27 @@ const swaggerUi = require("swagger-ui-express");
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
+const cors=require('cors');
 
 
 const app = express();
+
+
+// var corsOptions = {
+//     origin: ['http://localhost:3003','http://localhost:3003/','https://go-trip-next-88pq8alik-mdshahanshas-projects.vercel.app','https://go-trip-next-88pq8alik-mdshahanshas-projects.vercel.app/'],
+//     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   }
+// app.use(cors(corsOptions))
+const corsOptions = {
+    origin: [
+        'http://localhost:3003',
+        'https://go-trip-next-88pq8alik-mdshahanshas-projects.vercel.app'
+    ],
+    credentials: true, // Agar cookies ya authentication tokens send kar rahe ho
+    optionsSuccessStatus: 200 
+};
+
+app.use(cors(corsOptions));
 
 const logger = winston.createLogger({
   level: "info",
@@ -51,9 +69,9 @@ const amadeus = new Amadeus({
 app.get('/data', async (req, res) => {
     try {
       const response = await amadeus.shopping.flightOffersSearch.get({
-        originLocationCode: 'JFK',
-        destinationLocationCode: 'LAX',
-        departureDate: '2025-02-10',
+        originLocationCode: 'BLR',
+        destinationLocationCode: 'SIN',
+        departureDate: '2025-02-11',
         adults: 1
       });
   

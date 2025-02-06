@@ -45,20 +45,31 @@ const searchFlight=async (req,res)=>{
       body: req.body,
       user: req.user,
     });
-    const { origin, destination, date, adults } = req.body;
+    const { origin, destination, date, adults,returnDate,children } = req.body;
     const token = await getAmadeusToken();
-    console.log("amadeus token_______",  token);
+    // console.log("amadeus token_______",  token);
 
+    const params = {
+        originLocationCode: origin,
+        destinationLocationCode: destination,
+        departureDate: date,
+        adults,
+        max:20
+      };
+
+      if (children) {
+        params.children = children;
+      }
+      if (returnDate) {
+        params.returnDate = returnDate;
+      }
+
+      
     const response = await axios.get(
       "https://test.api.amadeus.com/v2/shopping/flight-offers",
       {
-        params: {
-          originLocationCode: origin,
-          destinationLocationCode: destination,
-          departureDate: date,
-          adults,
-        },
-        headers: { Authorization: `Bearer ${token}` },
+        params,
+        headers: { Authorization: `Bearer ${token}` }, 
       }
     );
     logger.info("Flights search response", { response: response.data });
@@ -83,10 +94,12 @@ const bookFlight=async (req,res)=>{
           { data: flightDetails },
           { headers: { Authorization: `Bearer ${token}` } } 
         );
+
         const booking = new Booking({
           user: req.user.userId,
           details: response.data,
         });
+
         await booking.save();
         logger.info("Flight booked successfully", { bookingId: booking._id });  
         res.json(response.data);
