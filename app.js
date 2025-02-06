@@ -26,7 +26,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3003',
         'https://go-trip-next-88pq8alik-mdshahanshas-projects.vercel.app',
-        'https://go-trip-next-git-main-mdshahanshas-projects.vercel.app/'
+        'https://go-trip-next-git-main-mdshahanshas-projects.vercel.app'
     ],
     credentials: true, // Agar cookies ya authentication tokens send kar rahe ho
     optionsSuccessStatus: 200 
